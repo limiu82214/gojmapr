@@ -1,0 +1,205 @@
+# `brew install golangci-lint`
+#
+# setting in vscode
+# ```
+# "go.lintTool": "golangci-lint",
+# "go.lintFlags": [
+#     "--fast"
+# ],
+# ```
+linters-settings:
+  errcheck:
+    check-type-assertions: true
+
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - experimental
+      - opinionated
+      - performance
+      - style
+  govet:
+    check-shadowing: true # 嵌套的scope不應該有相同的變數名宣告(可讀性)
+    check-unreachable: true
+    check-rangeloops: true
+    check-copylocks: true
+  interfacebloat:
+    max: 20
+  # nolintlint:
+    # require-explanation: false # 跳過lint的話要說明一下
+    # require-specific: true
+  tagliatelle:
+    case:
+      use-field-name: true
+      rules:
+        json: snake
+        yaml: snake
+    staticcheck:
+      checks: ["-ST1003"]
+    stylecheck:
+      checks: ["-ST1003"]
+
+
+issues:
+  exclude-rules:
+    - linters:
+      - funlen
+      source: "^func Test"
+    - linters:
+      - revive
+      text: "don't use ALL_CAPS in Go names; use CamelCase"
+    - linters:
+      - revive
+      text: "don't use an underscore in package name"
+
+
+linters:
+  disable-all: true
+  enable:
+    # 不符合我們專案但可能可以討論
+    # - exhaustruct # 檢查代碼中的結構體是否已經處理了所有可能的值。 # 我們的struct有些不會填滿，怕.jpg
+    # - gofumpt # 檢查代碼風格是否符合 Go 語言的官方風格指南，自動修正風格問題（與 gofmt 不同，gofumpt 使用更加嚴格的風格標準）
+    # - gomnd # 檢查是否有使用魔術數字（Magic number），有助於提高代碼的可讀性 # 我沒辦法使用 //nolint
+    # - unconvert # 檢查程式碼中不必要的型別轉換。 # 我想呼略參數
+
+    # 官方預設開啟
+    - gosimple # #style 尋找可能簡化的 Go 代碼，如冗餘變量、常量、函數、類型等；
+    - ineffassign # #unused 檢測沒有用到的變量賦值，可能是代碼錯誤；
+    - unused # #unused 檢查未使用的變數、函數、常量和類型等。
+    - govet # #bugs#metalinter 檢查代碼中可能存在的錯誤，如潛在的死鎖、資源泄露、未使用的變量等；
+    - staticcheck # #bugs#metalinter # 提供更強大的 go vet 工具，它可以檢查比 go vet 更多的錯誤類型，例如錯誤處理、網絡檢查等。
+    - errcheck # #bugs#error 檢查代碼中錯誤處理的不當或忽略。
+    - typecheck # #bugs 檢查程式碼的型別，包括一些可能隱藏的錯誤。
+
+    # 選用檢查權重 bugs > complexity > performance >>> metalinter > test > error > style
+    # `#特別好`tag是額外加分
+    # `#符合team`tag是目前團隊的style共識
+    #bugs
+    - durationcheck # #bugs 檢查代碼中是否有不正確的時間常量。
+    - errchkjson # #bugs 檢查 json.Unmarshal() 返回值的不當使用。
+    - exportloopref #bugs 檢查匯出變量循環引用。
+    - gosec # #bugs 檢測可能存在的安全風險，如密碼硬編碼、SQL 注入、XSS 等； # staticcheck
+    - makezero # #bugs#style 將變量賦值為零值的語句轉換為使用 make 函數；
+    - musttag # #bugs#style 檢查結構體的欄位中是否添加了必填標籤。
+    - nilerr # #bugs 檢查不必要的nil檢查，提高代碼可讀性和簡潔性。
+    - noctx # #bugs#performance 檢查不應使用context.Context的情況，提高代碼的可維護性和可讀性。
+    - reassign # #bugs 檢查變數重新賦值的情況，提高代碼可讀性和可維護性。
+    - sqlclosecheck # #bugs#sql 檢查 sql.Rows 和 sql.Tx 是否正確關閉。
+    - exhaustive # #bugs 檢查代碼中的 switch 是否已經處理了所有可能的值。
+    - asasalint # #bugs 檢查代碼中的 ASCII 非法字符。主要檢查注釋、字串和識別符中的 ASCII 字符
+    - asciicheck # #bugs 檢查代碼中的非 ASCII 字符。主要檢查源文件中的 ASCII 字符
+    - bidichk # #bugs 檢查代碼中的雙向文本方向錯誤。
+    - bodyclose # #bugs#performance 檢查代碼中是否已經關閉 HTTP 請求的正文。
+    - contextcheck # #bugs 檢查代碼中的上下文使用方式。
+    - gocheckcompilerdirectives # #bugs 檢查代碼中的 GO 編譯器指令。
+    #complexity
+    - gocyclo # #complexity 檢查代碼循環複雜度（Cyclomatic complexity），過高的循環複雜度會導致程式碼難以維護，也容易出現錯誤
+    - gocognit # #complexity 計算代碼復雜度，並提出需要改進的建議。
+    - funlen # #complexity 檢查函數的行數是否超過限制。
+    - maintidx # #complexity 尋找可能繁重的維護任務，如長方法、大塊註釋等；
+    - nestif # #complexity 檢查巢狀if語句，確保代碼可讀性和簡潔性。
+    #performance
+    - prealloc # #performance 檢查未使用預分配的切片和映射，提高代碼效率。
+    #metalinter
+    - gocritic # #metalinter#style 基於 Go 語言的最佳實踐，提供檢查代碼中的常見錯誤、不良實踐、不必要的代碼和不良風格的能力
+    #comment
+    - dupword # #comment 檢查代碼中是否有重複的單詞。
+    - misspell # #comment#style 檢查代碼中是否存在拼寫錯誤；
+    #test
+    - testableexamples # #test 確保示例代碼可以作為單元測試。
+    #error
+    - wrapcheck # #error#style 檢查長行代碼是否被正確包裝。 # 我們專案會把err往外傳，但建議是wrap起來再傳以幫助除錯/exhaustruct
+    #style
+    - revive # #style#meatalinter#特別好 靜態代碼分析工具，可以提高代碼質量和可維護性。 # 會建議我使用interface代替struct回傳
+    - nonamedreturns # #style#特別好 檢查具有未命名返回值的函數，確保代碼可讀性和可維護性。
+    - wsl # #style 換行的使用，增加可讀性與可誰維護性。
+    - goconst # #style#符合team 找出代碼中的字面常量，並將其提取到常量定義中。
+    - dogsled # #style 檢查代碼中的拼寫錯誤。
+    - forcetypeassert # #style 檢查代碼中強制類型斷言的使用。
+    - gochecknoglobals # #style#符合team 禁止在代碼中使用全局變量。
+    - gochecknoinits # #style#符合team 禁止在代碼中使用 init() 函數。
+    - godox # #style#comment 檢查代碼中的錯誤、拼錯的單詞以及缺少的單詞，有助於提高程式碼的可讀性 #提識你TODO: FIX: 還沒做的部份
+    # - grouper # #style 將相關的變量、函數和方法放在一起，便於代碼的閱讀和維護；
+    - lll # #style 檢測代碼行長，避免過長的行導致閱讀困難； # 官方預設是120
+    - interfacebloat # #style 檢查介面定義中是否包含沒有用到的方法，可能導致代碼複雜化；
+    - nilnil # #style 檢查潛在的nil或零值接收者和返回值，確保程序正確性和可讀性。
+    - nolintlint # #style 檢查代碼中的nolint註釋，確保其使用得當。
+    - predeclared # #style 檢查預聲明的變數，提高代碼可讀性和可維護性。
+    - promlinter # #style 檢查Prometheus度量標記，確保其格式正確。
+    - tagliatelle # #style#符合team 檢查 struct 的 field 是否有 tag，並且 tag 是否符合指定的命名規範。
+    - usestdlibvars # #style#符合team 檢查代碼中是否使用了標準庫的不建議變數。
+
+
+    # 被取代
+    # - cyclop # 計算代碼循環複雜度。 # gocyclo
+    # - unparam # 檢查不使用的函數參數。 # staticcheck
+    # - nakedret # #style 檢查裸露的返回語句（naked return），確保遵循最佳實踐。 # nonamedreturns
+    # - nlreturn # #style 檢查多行函數返回語句的格式，確保代碼可讀性和一致性。 // wsl
+    # - stylecheck # 檢查代碼風格，例如縮進、空格等。 # staticcheck
+
+
+
+    # 先關
+    # - ireturn #style 檢查函數中是否存在多餘的 return 語句，可能導致代碼難以閱讀； # 我們專案會回傳interface
+    # - paralleltest # #test#style 檢查測試代碼中的併發性，確保代碼的可測性和可靠性。
+    # - nosprintfhostport # #style 檢查代碼中的Sprintf函數，確保代碼正確性和安全性。
+    # - gomoddirectives # 檢查是否有在 Go 模組中使用了不必要或者不正確的指示詞
+    # - dupl # #style 找出重複的代碼/u塊。
+    # - varnamelen # 檢查變數命名長度是否符合慣例，有助於改善可讀性。
+    # - decorder # #format#style 檢查是否有解碼器（decoder）忘記關閉，進而導致資源洩漏的問題
+    # - containedctx # #style 檢查在請求範圍之外使用上下文。
+    # - depguard # 檢查 import 的模組是否存在。
+    # - errname # 檢查錯誤變量名的風格。
+    # - errorlint # 檢查錯誤處理的規則性。
+    # - execinquery # 檢查代碼中的 SQL 注入漏洞。
+    # - forbidigo # 檢查禁止使用 'go' 語句的標籤。
+    # - gci # 自動修正 import 的包名。
+    # - ginkgolinter # 檢查 Ginkgo 測試中的錯誤。
+    # - godot # Check if comments end in a period
+    # - goerr113 # 檢查錯誤訊息是否以小寫的"err"結尾，有助於提高代碼的可讀性
+    # - gofmt # 檢查代碼風格是否符合 Go 語言的官方風格指南，自動修正風格問題
+    # - goheader # 檢查 Go 檔案中是否有版權聲明和授權許可證，有助於提高代碼的可讀性和可維護性
+    # - goimports # 檢查是否有使用不必要的 import 語句或缺少必要的 import 語句，自動修正 import 問題
+    # - gomodguard # 檢查 Go 模組的版本號和相依項目，有助於保證項目的穩定性和一致性
+    # - goprintffuncname # 檢查是否有使用 fmt.Print*() 方法，並且傳遞了函數名稱，有助於提高代碼的可讀性
+    # - importas # 建議將 import 的套件重新命名，以減少名稱衝突；
+    # - loggercheck # 檢查代碼中是否存在沒有用到的日誌語句；
+    # - tenv # 檢查在應用程序中硬編碼的環境變量。
+    # - testpackage # 確保包中所有測試用例都已運行。
+    # - thelper # 提供一些有用的函數，這些函數可以幫助編寫單元測試。
+    # - tparallel # 檢查單元測試是否可以並行運行，提高測試效率。
+    # - whitespace # 檢查代碼中的空格和空行，幫助提高代碼的可讀性。
+
+    # 被世界放棄
+    # - ifshort
+    # - interfacer
+    # - maligned
+    # - nosnakecase
+    # - rowserrcheck
+    # - scopelint
+    # - structcheck
+    # - varcheck
+    # - wastedassign
+    # - golint
+    # - exhaustivestruct
+    # - deadcode
+
+  # 手動指令套件不需要
+  # presets:
+  #   - bugs
+  #   - comment
+  #   - complexity
+  #   - error
+  #   - format
+  #   - import
+  #   - metalinter
+  #   - module
+  #   - performance
+  #   - sql
+  #   - style
+  #   - unused
+  #   - test
+  fast: true
+
+run:
+  issues-exit-code: 1
