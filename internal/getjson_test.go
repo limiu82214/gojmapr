@@ -18,6 +18,19 @@ func (ex *ExampleSuite) TestSimpleJPath() {
 	jsonString := ex.complexJSONString
 
 	type tmpStruct struct {
+		RequestID string `getjson:"request_id"`
+	}
+
+	var s tmpStruct
+	err := Unmarshal([]byte(jsonString), &s)
+	ex.Assert().Nil(err)
+	ex.Assert().Equal(ex.anserStruct.RequestID, s.RequestID)
+}
+
+func (ex *ExampleSuite) TestSimpleJPathWithTime() {
+	jsonString := ex.complexJSONString
+
+	type tmpStruct struct {
 		CreateAt time.Time `getjson:"create_at"`
 	}
 
@@ -30,8 +43,8 @@ func (ex *ExampleSuite) TestNestedJPath() {
 	jsonString := ex.complexJSONString
 
 	type tmpStruct struct {
-		Name  string `getjson:"user.name"`
-		Email string `getjson:"user.email"`
+		Name  string `getjson:"$.user.name"`
+		Email string `getjson:"$.user.email"`
 	}
 
 	var s tmpStruct
@@ -45,8 +58,8 @@ func (ex *ExampleSuite) TestNested2JPath() {
 	jsonString := ex.complexJSONString
 
 	type tmpStruct struct {
-		ID    string  `getjson:"cart.items.0.product.id"`
-		Price float64 `getjson:"cart.items.0.product.price"`
+		ID    string  `getjson:"$.cart.items.0.product.id"`
+		Price float64 `getjson:"$.cart.items.0.product.price"`
 	}
 
 	var s tmpStruct
@@ -105,7 +118,8 @@ type ExampleStruct struct {
 		} `json:"address"`
 		Fee float64 `json:"fee"`
 	} `json:"shipping"`
-	CreateAt time.Time `json:"create_at"`
+	CreateAt  time.Time `json:"create_at"`
+	RequestID string    `json:"request_id"`
 }
 
 func (ex *ExampleSuite) SetupTest() {
@@ -147,7 +161,8 @@ func (ex *ExampleSuite) SetupTest() {
 			},
 			"fee": 5.99
 		},
-		"create_at": "2020-01-01T00:00:00Z"
+		"create_at": "2020-02-14T00:00:00Z",
+		"request_id": "omg9487"
 	}
 	`
 
