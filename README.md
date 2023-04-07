@@ -146,7 +146,7 @@ go test -v ./...
 
 ## Dependency
 
-* github.com/limiu82214/gojpath
+* [github.com/limiu82214/gojpath](http://github.com/limiu82214/gojpath)
 
 ## Other
 

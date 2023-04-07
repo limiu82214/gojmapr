@@ -19,6 +19,11 @@ var unmarshalFunc func([]byte, interface{}) error //nolint:gochecknoglobals // I
 // ErrInputNotPtrOfStruct 是一個錯誤，用來表示輸入的參數不是一個指向 struct 的指標。
 var ErrInputNotPtrOfStruct = fmt.Errorf("input must be a ptr of struct")
 
+// ErrMapDataToNilPtr is a error for mapping data to nil ptr.
+//
+// ErrMapDataToNilPtr 是一個錯誤，用來表示映射資料到 nil 指標。
+var ErrMapDataToNilPtr = fmt.Errorf("can not map data to nil ptr")
+
 // Unmarshal is a function for mapping json data to struct use like json.Unmarshal().
 //
 // Unmarshal 是一個用來將 json 資料映射到 struct 的函式，使用方式與 json.Unmarshal() 相同。
@@ -44,21 +49,23 @@ func mapIt(realData, e interface{}) error {
 	// If field is a struct, call mapIt() again.
 	// Otherwise use gojpath to get data from json.
 	for i := 0; i < eFieldCount; i++ {
-		etField := rt.Elem().Field(i)
-		jpath := etField.Tag.Get("gojmapr")
-		field := rv.Elem().Field(i)
+		tField := rt.Elem().Field(i)
+		jpath := tField.Tag.Get("gojmapr")
+		vField := rv.Elem().Field(i)
 
 		switch {
-		case jpath == "" && isStruct(field):
-			err := mapIt(realData, field.Addr().Interface())
+		case jpath == "" && isStruct(vField):
+			err := mapIt(realData, vField.Addr().Interface())
 			if err != nil {
 				return err
 			}
-		case jpath == "" && isPtrOfStruct(field):
-			err := mapIt(realData, field.Interface())
+		case jpath == "" && !isPtrNil(vField) && isPtrOfStruct(vField):
+			err := mapIt(realData, vField.Interface())
 			if err != nil {
 				return err
 			}
+		case jpath == "" && isPtrNil(vField):
+			return ErrMapDataToNilPtr
 		default:
 			v, err := gojpath.Get(realData, jpath)
 			if err != nil {
@@ -67,12 +74,12 @@ func mapIt(realData, e interface{}) error {
 
 			realDataRV := reflect.ValueOf(v)
 
-			realDataRV, err = changeRealDataType(realDataRV, etField.Type)
+			realDataRV, err = changeRealDataType(realDataRV, tField.Type)
 			if err != nil {
 				return err
 			}
 
-			setDataToField(field, realDataRV)
+			setDataToField(vField, realDataRV)
 		}
 	}
 
@@ -114,6 +121,10 @@ func getReadData(jsonString []byte) (interface{}, error) {
 
 func isStruct(rv reflect.Value) bool {
 	return rv.Kind() == reflect.Struct
+}
+
+func isPtrNil(rv reflect.Value) bool {
+	return rv.Kind() == reflect.Ptr && rv.IsNil()
 }
 
 func isPtrOfStruct(rv reflect.Value) bool {

@@ -158,6 +158,42 @@ func (ex *ExampleSuite) TestNestedStructError() {
 	ex.Assert().NotNil(err)
 }
 
+func (ex *ExampleSuite) TestNestedPtrStructError() {
+	jsonString := `{}`
+
+	type nestedStruct struct {
+		RequestID string `gojmapr:"$.cart"`
+	}
+
+	type tmpStruct struct {
+		NestedStruct *nestedStruct
+	}
+
+	s := tmpStruct{
+		NestedStruct: &nestedStruct{
+			RequestID: "",
+		},
+	}
+	err := Unmarshal([]byte(jsonString), &s)
+	ex.Assert().NotNil(err)
+}
+
+func (ex *ExampleSuite) TestNestedNilPtrStructError() {
+	jsonString := `{}`
+
+	type nestedStruct struct {
+		RequestID string `gojmapr:"$.cart"`
+	}
+
+	type tmpStruct struct {
+		NestedStruct *nestedStruct
+	}
+
+	s := tmpStruct{}
+	err := Unmarshal([]byte(jsonString), &s)
+	ex.Assert().NotNil(err)
+}
+
 type ExampleStruct struct {
 	User struct {
 		Name  string `json:"name"`

@@ -144,8 +144,7 @@ go test -v ./...
 
 ## 依賴
 
-* github.com/limiu82214/gojpath
-
+* [github.com/limiu82214/gojpath](http://github.com/limiu82214/gojpath)
 
 ## 其他
 
