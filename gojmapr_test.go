@@ -5,6 +5,8 @@ import (
 	"testing"
 	"time"
 
+	jsoniter "github.com/json-iterator/go"
+
 	"github.com/stretchr/testify/suite"
 )
 
@@ -90,6 +92,26 @@ func (ex *ExampleSuite) TestNestedStructJPath() {
 	ex.Assert().Equal(ex.anserStruct.Cart.Items[0].Product.Name, s.User.Name)
 	ex.Assert().Equal(ex.anserStruct.User.Email, s.User.Email)
 	ex.Assert().Equal(ex.anserStruct.Cart.Items[0].Product.ID, s.ID)
+}
+
+func (ex *ExampleSuite) TestJsonPlugin() {
+	jsonString := ex.complexJSONString
+
+	type tmpStruct struct {
+		RequestID string `getjson:"$.request_id"`
+	}
+
+	SetUnmarshalFunc(jsoniter.Unmarshal)
+
+	var s tmpStruct
+	err := Unmarshal([]byte(jsonString), &s)
+	ex.Assert().Nil(err)
+	ex.Assert().Equal(ex.anserStruct.RequestID, s.RequestID)
+
+	SetUnmarshalFunc(json.Unmarshal)
+	err = Unmarshal([]byte(jsonString), &s)
+	ex.Assert().Nil(err)
+	ex.Assert().Equal(ex.anserStruct.RequestID, s.RequestID)
 }
 
 type ExampleStruct struct {

@@ -1,5 +1,7 @@
 # GetJSON
 
+![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/limiu82214/gojmapr?label=version) [![Go Reference](https://pkg.go.dev/badge/github.com/limiu82214/gojmapr.svg)](https://pkg.go.dev/github.com/limiu82214/gojmapr) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![codecov](https://codecov.io/gh/limiu82214/gojmapr/branch/master/graph/badge.svg?token=0XAK9BB5WL)](https://codecov.io/gh/limiu82214/gojmapr) [![Go Report Card](https://goreportcard.com/badge/github.com/limiu82214/gojmapr)](https://goreportcard.com/report/github.com/limiu82214/gojmapr) ![github actions workflow](https://github.com/limiu82214/gojmapr/actions/workflows/go.yml/badge.svg)  
+
 GetJSON是一個Golang庫，可以從複雜的JSON字符串中快速提取指定的屬性並轉換為Go結構。
 
 使用GetJSON，您不需要宣告完整對應JSON的Go結構，只需要提供需要的屬性即可。
@@ -112,6 +114,26 @@ func main() {
 
 更多的使用示例可以在項目中的測試代碼中找到。
 
+## 使用其他 Unmarshal 套件
+
+```go
+
+import jsoniter "github.com/json-iterator/go"
+
+type tmpStruct struct {
+    RequestID string `getjson:"$.request_id"`
+}
+
+SetUnmarshalFunc(jsoniter.Unmarshal) // 您可以使用其他解析套件，例如json-iterator
+
+var s tmpStruct
+err := Unmarshal([]byte(jsonString), &s)
+ex.Assert().Nil(err)
+ex.Assert().Equal(ex.anserStruct.RequestID, s.RequestID)
+```
+
+gojmapr可以使用其他解析套件，例如json-iterator。
+
 ## 測試
 
 GetJSON使用testify套件進行測試。要運行測試，請使用以下命令：
@@ -120,7 +142,15 @@ GetJSON使用testify套件進行測試。要運行測試，請使用以下命令
 go test -v ./...
 ```
 
-## TODO
+## 依賴
 
-* [] 編寫介面，支援多種不同的第三方json套件，以提高GetJSON的適用性。
-* [] 提供一個原生的介面，使得用戶可以透過GetJSON使用原本json的方法，從而讓使用者更加熟悉和方便使用。
+* github.com/limiu82214/gojpath
+
+
+## 其他
+
+如果您在使用過程中有任何問題，歡迎在 GitHub 專案上發起一個 issue，或是透過 email 與我聯繫。如果您認為這個專案對您有所幫助，也請不吝給予一個 star。
+
+## 授權
+
+[MIT License](./LICENSE)

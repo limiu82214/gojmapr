@@ -1,5 +1,8 @@
-[中文](./README_ZH.md)
 # GetJSON
+
+![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/limiu82214/gojmapr?label=version) [![Go Reference](https://pkg.go.dev/badge/github.com/limiu82214/gojmapr.svg)](https://pkg.go.dev/github.com/limiu82214/gojmapr) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![codecov](https://codecov.io/gh/limiu82214/gojmapr/branch/master/graph/badge.svg?token=0XAK9BB5WL)](https://codecov.io/gh/limiu82214/gojmapr) [![Go Report Card](https://goreportcard.com/badge/github.com/limiu82214/gojmapr)](https://goreportcard.com/report/github.com/limiu82214/gojmapr) ![github actions workflow](https://github.com/limiu82214/gojmapr/actions/workflows/go.yml/badge.svg)  
+
+[中文版文檔](./README_ZH.md)
 
 GetJSON is a Golang library that allows for quick extraction of specified properties from complex JSON strings and converts them into corresponding Go structures.
 
@@ -113,6 +116,26 @@ func main() {
 
 More examples of usage can be found in the test code in the project.
 
+## Use other Unmarshal package
+
+```go
+
+import jsoniter "github.com/json-iterator/go"
+
+type tmpStruct struct {
+    RequestID string `getjson:"$.request_id"`
+}
+
+SetUnmarshalFunc(jsoniter.Unmarshal) // You can use other Unmarshal module ex: json-iterator
+
+var s tmpStruct
+err := Unmarshal([]byte(jsonString), &s)
+ex.Assert().Nil(err)
+ex.Assert().Equal(ex.anserStruct.RequestID, s.RequestID)
+```
+
+gojmapr can use other Unmarshal package ex: json-iterator.  
+
 ## Testing
 
 GetJSON uses the testify package for testing. To run the tests, use the following command:
@@ -121,7 +144,14 @@ GetJSON uses the testify package for testing. To run the tests, use the followin
 go test -v ./...
 ```
 
-## TODO
+## Dependency
 
-* [] Write an interface that supports multiple different third-party JSON packages to enhance the versatility of GetJSON.
-* [] Provide a native interface that allows users to use the original JSON methods through GetJSON, making it more familiar and convenient for users.
+* github.com/limiu82214/gojpath
+
+## Other
+
+If you encounter any issues during use, please feel free to raise an issue on the GitHub project or contact me via email. If you find this project helpful, please consider giving it a star.
+
+## LICENSE
+
+[MIT License](./LICENSE)
