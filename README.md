@@ -138,7 +138,8 @@ gojmapr can use other Unmarshal package ex: json-iterator.
 
 ## Testing
 
-gojmapr uses the testify package for testing. To run the tests, use the following command:
+gojmapr uses the testify package for testing.  
+To run the tests, use the following command:
 
 ```bash
 go test -v ./...
@@ -150,7 +151,8 @@ go test -v ./...
 
 ## Other
 
-If you encounter any issues during use, please feel free to raise an issue on the GitHub project or contact me via email. If you find this project helpful, please consider giving it a star.
+If you encounter any issues during use, please feel free to raise an issue on the GitHub project or contact me via email.  
+If you find this project helpful, please consider giving it a star.
 
 ## LICENSE
 
