@@ -1,11 +1,21 @@
 package getjson
 
+// TODO: output error
+// TODO: get into awesome-go
+// pkg.go.dev
+// goreportcard.com
+// coverage
+
 import (
 	"encoding/json"
 	"fmt"
 	"reflect"
 	"time"
+
+	"github.com/limiu82214/getjson/pkg/gojpath"
 )
+
+var unmarshal func([]byte, interface{}) error
 
 func Unmarshal(jsonString []byte, e interface{}) error {
 	realData, err := getReadData(jsonString)
@@ -13,9 +23,13 @@ func Unmarshal(jsonString []byte, e interface{}) error {
 		return err
 	}
 
+	return mapIt(realData, e)
+}
+
+func mapIt(realData, e interface{}) error {
 	rv := reflect.ValueOf(e)
-	if err2 := valid(rv); err2 != nil {
-		return err2
+	if !isPtrOfStruct(rv) {
+		return fmt.Errorf("e must be a ptr of struct")
 	}
 
 	rt := reflect.TypeOf(e)
@@ -24,49 +38,85 @@ func Unmarshal(jsonString []byte, e interface{}) error {
 	for i := 0; i < eFieldCount; i++ {
 		etField := rt.Elem().Field(i)
 		jpath := etField.Tag.Get("getjson")
+		field := rv.Elem().Field(i)
 
-		// FIXME: support json path
-		// FIXME: support nested json path
+		switch {
+		case jpath == "" && isStruct(field):
+			err := mapIt(realData, field.Addr().Interface())
+			if err != nil {
+				return err
+			}
+		case jpath == "" && isPtrOfStruct(field):
+			err := mapIt(realData, field.Interface())
+			if err != nil {
+				return err
+			}
+		default:
+			v := gojpath.Get(realData, jpath)
+			realDataRV := reflect.ValueOf(v)
 
-		realDataRV := getDataByJPath(realData, jpath)
+			realDataRV, err := changeRealDataType(realDataRV, etField.Type)
+			if err != nil {
+				return err
+			}
 
-		realDataRV, err = changeRealDataType(realDataRV, etField.Type)
-		if err != nil {
-			return err
+			setDataToField(field, realDataRV)
 		}
-
-		f := rv.Elem().Field(i)
-		setDataToField(f, realDataRV)
 	}
 
 	return nil
 }
 
-func getReadData(jsonString []byte) (map[string]interface{}, error) {
-	realData := make(map[string]interface{})
-	err := json.Unmarshal(jsonString, &realData)
+func SetUnmarshalFunc(f func([]byte, interface{}) error) {
+	unmarshal = f
+}
 
-	if err != nil {
-		return nil, fmt.Errorf("json.Unmarshal error: %v", err)
+func callUnmarshal(jsonString []byte, data interface{}) error {
+	var err error
+	if unmarshal != nil {
+		err = unmarshal(jsonString, &data)
+	} else {
+		err = json.Unmarshal(jsonString, &data)
 	}
 
-	return realData, nil
+	if err != nil {
+		return fmt.Errorf("json.Unmarshal error: %v", err)
+	}
+
+	return nil
+}
+
+func getReadData(jsonString []byte) (interface{}, error) {
+	var data interface{}
+
+	err := callUnmarshal(jsonString, &data)
+	if err != nil {
+		return nil, fmt.Errorf("callUnmarshal error: %v", err)
+	}
+
+	return data, nil
 }
 
 func valid(rv reflect.Value) error {
-	if rv.Kind() != reflect.Ptr {
-		return fmt.Errorf("e must be a ptr")
-	}
-
-	if rv.Elem().Kind() != reflect.Struct { // ?
+	if isPtrOfStruct(rv) {
 		return fmt.Errorf("e must be a ptr of struct")
 	}
 
 	return nil
 }
 
-func getDataByJPath(realData map[string]interface{}, jpath string) reflect.Value {
-	return reflect.ValueOf(realData[jpath])
+func isStruct(rv reflect.Value) bool {
+	return rv.Kind() == reflect.Struct
+}
+
+func isPtrOfStruct(rv reflect.Value) bool {
+	if rv.Kind() == reflect.Ptr {
+		if rv.Elem().Kind() == reflect.Struct {
+			return true
+		}
+	}
+
+	return false
 }
 
 func changeRealDataType(realDataRV reflect.Value, targetType reflect.Type) (reflect.Value, error) {

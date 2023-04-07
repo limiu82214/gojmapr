@@ -93,6 +93,20 @@ func main() {
     }
 
     fmt.Println(s.Name) // Output: John
+
+    type tmpStruct2 struct {
+        ID    string  `getjson:"$.cart.items[0].product.id"`
+        Price float64 `getjson:"$.cart.items.0.product.price"`
+    }
+
+    var s2 tmpStruct
+    err := Unmarshal([]byte(jsonString), &s2)
+    if err != nil {
+        panic(err)
+    }
+
+    fmt.Println(s2.ID) // Output: 123
+    fmt.Println(s2.Price) // Output: 10.99
 }
 ```
 

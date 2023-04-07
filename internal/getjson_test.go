@@ -18,7 +18,7 @@ func (ex *ExampleSuite) TestSimpleJPath() {
 	jsonString := ex.complexJSONString
 
 	type tmpStruct struct {
-		RequestID string `getjson:"request_id"`
+		RequestID string `getjson:"$.request_id"`
 	}
 
 	var s tmpStruct
@@ -31,7 +31,7 @@ func (ex *ExampleSuite) TestSimpleJPathWithTime() {
 	jsonString := ex.complexJSONString
 
 	type tmpStruct struct {
-		CreateAt time.Time `getjson:"create_at"`
+		CreateAt time.Time `getjson:"$.create_at"`
 	}
 
 	var s tmpStruct
@@ -58,7 +58,7 @@ func (ex *ExampleSuite) TestNested2JPath() {
 	jsonString := ex.complexJSONString
 
 	type tmpStruct struct {
-		ID    string  `getjson:"$.cart.items.0.product.id"`
+		ID    string  `getjson:"$.cart.items[0].product.id"`
 		Price float64 `getjson:"$.cart.items.0.product.price"`
 	}
 
@@ -69,22 +69,23 @@ func (ex *ExampleSuite) TestNested2JPath() {
 	ex.Assert().Equal(ex.anserStruct.Cart.Items[0].Product.Price, s.Price)
 }
 
-func (ex *ExampleSuite) TestStructJPath() {
+func (ex *ExampleSuite) TestNestedStructJPath() {
 	jsonString := ex.complexJSONString
 
 	type tmpStruct struct {
 		User struct {
-			Name  string `getjson:"name"`
-			Email string `getjson:"email"`
-		} `getjson:"user"`
+			Name  string `getjson:"$.cart.items[0].product.name"`
+			Email string `getjson:"$.user.email"`
+		}
+		ID string `getjson:"$.cart.items[0].product.id"`
 	}
 
-	var s tmpStruct
+	s := tmpStruct{}
 	err := Unmarshal([]byte(jsonString), &s)
 	ex.Assert().Nil(err)
-	ex.Assert().Equal(ex.anserStruct.User, s.User)
-	ex.Assert().Equal(ex.anserStruct.User.Name, s.User.Name)
+	ex.Assert().Equal(ex.anserStruct.Cart.Items[0].Product.Name, s.User.Name)
 	ex.Assert().Equal(ex.anserStruct.User.Email, s.User.Email)
+	ex.Assert().Equal(ex.anserStruct.Cart.Items[0].Product.ID, s.ID)
 }
 
 func TestExampleSuite(t *testing.T) {
@@ -169,10 +170,3 @@ func (ex *ExampleSuite) SetupTest() {
 	err := json.Unmarshal([]byte(ex.complexJSONString), &ex.anserStruct)
 	ex.Assert().Nil(err)
 }
-
-// expected := ExampleStruct{Name: "John", Email: "john@example.com"}
-// expected := "example"
-// actual, err := JPath(jsonString, "field1")
-// actual, err := GetExampleStruct(suite.complexJsonString)
-// assert.NoError(t, err)
-// assert.Equal(t, expected, actual)
