@@ -1,4 +1,4 @@
-package getjson
+package gojmapr
 
 import (
 	"encoding/json"
@@ -12,6 +12,10 @@ type ExampleSuite struct {
 	suite.Suite
 	complexJSONString string
 	anserStruct       ExampleStruct
+}
+
+func TestExampleSuite(t *testing.T) {
+	suite.Run(t, new(ExampleSuite))
 }
 
 func (ex *ExampleSuite) TestSimpleJPath() {
@@ -86,10 +90,6 @@ func (ex *ExampleSuite) TestNestedStructJPath() {
 	ex.Assert().Equal(ex.anserStruct.Cart.Items[0].Product.Name, s.User.Name)
 	ex.Assert().Equal(ex.anserStruct.User.Email, s.User.Email)
 	ex.Assert().Equal(ex.anserStruct.Cart.Items[0].Product.ID, s.ID)
-}
-
-func TestExampleSuite(t *testing.T) {
-	suite.Run(t, new(ExampleSuite))
 }
 
 type ExampleStruct struct {

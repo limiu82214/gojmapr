@@ -1,4 +1,4 @@
-package getjson
+package gojmapr
 
 // TODO: output error
 // TODO: get into awesome-go
@@ -12,7 +12,7 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/limiu82214/getjson/pkg/gojpath"
+	"github.com/limiu82214/gojpath"
 )
 
 var unmarshal func([]byte, interface{}) error
@@ -52,10 +52,14 @@ func mapIt(realData, e interface{}) error {
 				return err
 			}
 		default:
-			v := gojpath.Get(realData, jpath)
+			v, err := gojpath.Get(realData, jpath)
+			if err != nil {
+				return fmt.Errorf("gojpath.Get error: %v", err)
+			}
+
 			realDataRV := reflect.ValueOf(v)
 
-			realDataRV, err := changeRealDataType(realDataRV, etField.Type)
+			realDataRV, err = changeRealDataType(realDataRV, etField.Type)
 			if err != nil {
 				return err
 			}
