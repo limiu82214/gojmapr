@@ -1,12 +1,12 @@
-# GetJSON
+# gojmapr
 
 ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/limiu82214/gojmapr?label=version) [![Go Reference](https://pkg.go.dev/badge/github.com/limiu82214/gojmapr.svg)](https://pkg.go.dev/github.com/limiu82214/gojmapr) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![codecov](https://codecov.io/gh/limiu82214/gojmapr/branch/master/graph/badge.svg?token=0XAK9BB5WL)](https://codecov.io/gh/limiu82214/gojmapr) [![Go Report Card](https://goreportcard.com/badge/github.com/limiu82214/gojmapr)](https://goreportcard.com/report/github.com/limiu82214/gojmapr) ![github actions workflow](https://github.com/limiu82214/gojmapr/actions/workflows/go.yml/badge.svg)  
 
-GetJSON是一個Golang庫，可以從複雜的JSON字符串中快速提取指定的屬性並轉換為Go結構。
+gojmapr是一個Golang庫，可以從複雜的JSON字符串中快速提取指定的屬性並轉換為Go結構。
 
-使用GetJSON，您不需要宣告完整對應JSON的Go結構，只需要提供需要的屬性即可。
+使用gojmapr，您不需要宣告完整對應JSON的Go結構，只需要提供需要的屬性即可。
 
-這使得GetJSON非常適合在存取第三方資源時提取指定資料使用，讓您的程式碼更加簡潔易讀。
+這使得gojmapr非常適合在存取第三方資源時提取指定資料使用，讓您的程式碼更加簡潔易讀。
 
 ## 特點
 
@@ -15,23 +15,23 @@ GetJSON是一個Golang庫，可以從複雜的JSON字符串中快速提取指定
 
 ## 安裝
 
-要使用GetJSON，首先需要將其添加到你的Golang項目中：
+要使用gojmapr，首先需要將其添加到你的Golang項目中：
 
 ```go
-go get github.com/limiu82214/getjson
+go get github.com/limiu82214/gojmapr
 ```
 
 ## 使用方式
 
-要使用GetJSON庫，只需要將其導入到你的代碼中，然後按照以下步驟進行操作：
+要使用gojmapr庫，只需要將其導入到你的代碼中，然後按照以下步驟進行操作：
 
 1. 定義一個與你要解析的JSON字符串對應的結構體。
-2. 為結構體中的每個屬性添加getjson標籤，以指定從JSON字符串中提取該屬性的路徑。(參考jpath)
-3. 使用getjson.Unmarshal函數將JSON字符串解析為結構體對象。
+2. 為結構體中的每個屬性添加gojmapr標籤，以指定從JSON字符串中提取該屬性的路徑。(參考jpath)
+3. 使用gojmapr.Unmarshal函數將JSON字符串解析為結構體對象。
 
 ## 使用方法
 
-下面是一個簡單的示例，展示了如何使用GetJSON庫從JSON字符串中提取屬性。
+下面是一個簡單的示例，展示了如何使用gojmapr庫從JSON字符串中提取屬性。
 
 ```go
 package main
@@ -39,7 +39,7 @@ package main
 import (
     "fmt"
 
-    "github.com/limiu82214/getjson"
+    "github.com/limiu82214/gojmapr"
 )
 
 func main() {
@@ -85,11 +85,11 @@ func main() {
     }`
 
     type tmpStruct struct {
-        Name string `getjson:"user.name"`
+        Name string `gojmapr:"user.name"`
     }
 
     var s tmpStruct
-    err := getjson.Unmarshal([]byte(jsonString), &s)
+    err := gojmapr.Unmarshal([]byte(jsonString), &s)
     if err != nil {
         panic(err)
     }
@@ -97,8 +97,8 @@ func main() {
     fmt.Println(s.Name) // Output: John
 
     type tmpStruct2 struct {
-        ID    string  `getjson:"$.cart.items[0].product.id"`
-        Price float64 `getjson:"$.cart.items.0.product.price"`
+        ID    string  `gojmapr:"$.cart.items[0].product.id"`
+        Price float64 `gojmapr:"$.cart.items.0.product.price"`
     }
 
     var s2 tmpStruct
@@ -121,7 +121,7 @@ func main() {
 import jsoniter "github.com/json-iterator/go"
 
 type tmpStruct struct {
-    RequestID string `getjson:"$.request_id"`
+    RequestID string `gojmapr:"$.request_id"`
 }
 
 SetUnmarshalFunc(jsoniter.Unmarshal) // 您可以使用其他解析套件，例如json-iterator
@@ -136,7 +136,7 @@ gojmapr可以使用其他解析套件，例如json-iterator。
 
 ## 測試
 
-GetJSON使用testify套件進行測試。要運行測試，請使用以下命令：
+gojmapr使用testify套件進行測試。要運行測試，請使用以下命令：
 
 ```bash
 go test -v ./...

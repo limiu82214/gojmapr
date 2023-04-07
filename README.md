@@ -1,14 +1,14 @@
-# GetJSON
+# gojmapr
 
 ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/limiu82214/gojmapr?label=version) [![Go Reference](https://pkg.go.dev/badge/github.com/limiu82214/gojmapr.svg)](https://pkg.go.dev/github.com/limiu82214/gojmapr) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![codecov](https://codecov.io/gh/limiu82214/gojmapr/branch/master/graph/badge.svg?token=QX59JZM663)](https://codecov.io/gh/limiu82214/gojmapr) [![Go Report Card](https://goreportcard.com/badge/github.com/limiu82214/gojmapr)](https://goreportcard.com/report/github.com/limiu82214/gojmapr) ![github actions workflow](https://github.com/limiu82214/gojmapr/actions/workflows/go.yml/badge.svg)  
 
 [中文版文檔](./README_ZH.md)
 
-GetJSON is a Golang library that allows for quick extraction of specified properties from complex JSON strings and converts them into corresponding Go structures.
+gojmapr is a Golang library that allows for quick extraction of specified properties from complex JSON strings and converts them into corresponding Go structures.
 
-With GetJSON, you don't need to declare a complete Go structure that corresponds to the entire JSON structure, just provide the required properties.
+With gojmapr, you don't need to declare a complete Go structure that corresponds to the entire JSON structure, just provide the required properties.
 
-This makes GetJSON particularly useful for extracting specific data when accessing third-party resources, making your code more concise and readable.
+This makes gojmapr particularly useful for extracting specific data when accessing third-party resources, making your code more concise and readable.
 
 ## Features
 
@@ -17,23 +17,23 @@ Supports nested properties: Easily extract required properties from JSON strings
 
 ## Installation
 
-To use GetJSON, first add it to your Golang project:
+To use gojmapr, first add it to your Golang project:
 
 ```go
-go get github.com/limiu82214/getjson
+go get github.com/limiu82214/gojmapr
 ```
 
 ## Usage
 
-To use the GetJSON library, simply import it into your code and follow these steps:
+To use the gojmapr library, simply import it into your code and follow these steps:
 
 Define a struct that corresponds to the JSON string you want to parse.
-Add the getjson tag to each property in the struct to specify the path to extract the property from the JSON string (reference jpath).
-Use the getjson.Unmarshal function to parse the JSON string into a struct object.
+Add the gojmapr tag to each property in the struct to specify the path to extract the property from the JSON string (reference jpath).
+Use the gojmapr.Unmarshal function to parse the JSON string into a struct object.
 
 ## Example
 
-Here's a simple example that shows how to use the GetJSON library to extract properties from a JSON string.
+Here's a simple example that shows how to use the gojmapr library to extract properties from a JSON string.
 
 ```go
 package main
@@ -41,7 +41,7 @@ package main
 import (
     "fmt"
 
-    "github.com/limiu82214/getjson"
+    "github.com/limiu82214/gojmapr"
 )
 
 func main() {
@@ -87,11 +87,11 @@ func main() {
     }`
 
     type tmpStruct struct {
-        Name string `getjson:"user.name"`
+        Name string `gojmapr:"user.name"`
     }
 
     var s tmpStruct
-    err := getjson.Unmarshal([]byte(jsonString), &s)
+    err := gojmapr.Unmarshal([]byte(jsonString), &s)
     if err != nil {
         panic(err)
     }
@@ -99,8 +99,8 @@ func main() {
     fmt.Println(s.Name) // Output: John
 
     type tmpStruct2 struct {
-        ID    string  `getjson:"$.cart.items[0].product.id"`
-        Price float64 `getjson:"$.cart.items.0.product.price"`
+        ID    string  `gojmapr:"$.cart.items[0].product.id"`
+        Price float64 `gojmapr:"$.cart.items.0.product.price"`
     }
 
     var s2 tmpStruct
@@ -123,7 +123,7 @@ More examples of usage can be found in the test code in the project.
 import jsoniter "github.com/json-iterator/go"
 
 type tmpStruct struct {
-    RequestID string `getjson:"$.request_id"`
+    RequestID string `gojmapr:"$.request_id"`
 }
 
 SetUnmarshalFunc(jsoniter.Unmarshal) // You can use other Unmarshal module ex: json-iterator
@@ -138,7 +138,7 @@ gojmapr can use other Unmarshal package ex: json-iterator.
 
 ## Testing
 
-GetJSON uses the testify package for testing. To run the tests, use the following command:
+gojmapr uses the testify package for testing. To run the tests, use the following command:
 
 ```bash
 go test -v ./...

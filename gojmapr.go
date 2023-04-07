@@ -45,7 +45,7 @@ func mapIt(realData, e interface{}) error {
 	// Otherwise use gojpath to get data from json.
 	for i := 0; i < eFieldCount; i++ {
 		etField := rt.Elem().Field(i)
-		jpath := etField.Tag.Get("getjson")
+		jpath := etField.Tag.Get("gojmapr")
 		field := rv.Elem().Field(i)
 
 		switch {

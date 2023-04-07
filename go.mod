@@ -1,4 +1,4 @@
-module github.com/limiu82214/getjson
+module github.com/limiu82214/gojmapr
 
 go 1.19
 

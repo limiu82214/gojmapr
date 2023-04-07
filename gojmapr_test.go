@@ -24,7 +24,7 @@ func (ex *ExampleSuite) TestSimpleJPath() {
 	jsonString := ex.complexJSONString
 
 	type tmpStruct struct {
-		RequestID string `getjson:"$.request_id"`
+		RequestID string `gojmapr:"$.request_id"`
 	}
 
 	var s tmpStruct
@@ -37,7 +37,7 @@ func (ex *ExampleSuite) TestSimpleJPathWithTime() {
 	jsonString := ex.complexJSONString
 
 	type tmpStruct struct {
-		CreateAt time.Time `getjson:"$.create_at"`
+		CreateAt time.Time `gojmapr:"$.create_at"`
 	}
 
 	var s tmpStruct
@@ -49,8 +49,8 @@ func (ex *ExampleSuite) TestNestedJPath() {
 	jsonString := ex.complexJSONString
 
 	type tmpStruct struct {
-		Name  string `getjson:"$.user.name"`
-		Email string `getjson:"$.user.email"`
+		Name  string `gojmapr:"$.user.name"`
+		Email string `gojmapr:"$.user.email"`
 	}
 
 	var s tmpStruct
@@ -64,8 +64,8 @@ func (ex *ExampleSuite) TestNested2JPath() {
 	jsonString := ex.complexJSONString
 
 	type tmpStruct struct {
-		ID    string  `getjson:"$.cart.items[0].product.id"`
-		Price float64 `getjson:"$.cart.items.0.product.price"`
+		ID    string  `gojmapr:"$.cart.items[0].product.id"`
+		Price float64 `gojmapr:"$.cart.items.0.product.price"`
 	}
 
 	var s tmpStruct
@@ -80,10 +80,10 @@ func (ex *ExampleSuite) TestNestedStructJPath() {
 
 	type tmpStruct struct {
 		User struct {
-			Name  string `getjson:"$.cart.items[0].product.name"`
-			Email string `getjson:"$.user.email"`
+			Name  string `gojmapr:"$.cart.items[0].product.name"`
+			Email string `gojmapr:"$.user.email"`
 		}
-		ID string `getjson:"$.cart.items[0].product.id"`
+		ID string `gojmapr:"$.cart.items[0].product.id"`
 	}
 
 	s := tmpStruct{}
@@ -98,20 +98,64 @@ func (ex *ExampleSuite) TestJsonPlugin() {
 	jsonString := ex.complexJSONString
 
 	type tmpStruct struct {
-		RequestID string `getjson:"$.request_id"`
+		RequestID string `gojmapr:"$.request_id"`
 	}
-
-	SetUnmarshalFunc(jsoniter.Unmarshal)
 
 	var s tmpStruct
 	err := Unmarshal([]byte(jsonString), &s)
 	ex.Assert().Nil(err)
 	ex.Assert().Equal(ex.anserStruct.RequestID, s.RequestID)
 
-	SetUnmarshalFunc(json.Unmarshal)
+	SetUnmarshalFunc(jsoniter.Unmarshal)
 	err = Unmarshal([]byte(jsonString), &s)
 	ex.Assert().Nil(err)
 	ex.Assert().Equal(ex.anserStruct.RequestID, s.RequestID)
+}
+
+func (ex *ExampleSuite) TestParseTimeError() {
+	jsonString := ex.complexJSONString
+
+	type tmpStruct struct {
+		FailTime time.Time `gojmapr:"$.request_id"`
+	}
+
+	var s tmpStruct
+	err := Unmarshal([]byte(jsonString), &s)
+	ex.Assert().NotNil(err)
+}
+
+func (ex *ExampleSuite) TestNotJSONError() {
+	jsonString := `?`
+
+	type tmpStruct struct {
+		RequestID string `gojmapr:"$.request_id"`
+	}
+
+	var s tmpStruct
+	err := Unmarshal([]byte(jsonString), &s)
+	ex.Assert().NotNil(err)
+}
+
+func (ex *ExampleSuite) TestNotStructError() {
+	jsonString := `{}`
+
+	var s int
+	err := Unmarshal([]byte(jsonString), &s)
+	ex.Assert().NotNil(err)
+}
+
+func (ex *ExampleSuite) TestNestedStructError() {
+	jsonString := `{}`
+
+	type tmpStruct struct {
+		NestedStruct struct {
+			RequestID string `gojmapr:"$.request_id"`
+		}
+	}
+
+	var s tmpStruct
+	err := Unmarshal([]byte(jsonString), &s)
+	ex.Assert().NotNil(err)
 }
 
 type ExampleStruct struct {
