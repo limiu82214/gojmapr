@@ -1,13 +1,17 @@
-name: Master
+name: Tag
 
 on:
-  pull_request:
-    branches: [ "master" ]
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+
+    - name: Check out code
+      uses: actions/checkout@v3
 
     - name: Set up Go
       uses: actions/setup-go@v3
