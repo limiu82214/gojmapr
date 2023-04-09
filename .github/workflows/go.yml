@@ -2,12 +2,11 @@ name: Go
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "!master" ] # not allow push to master, should use PR
   pull_request:
     branches: [ "master" ]
 
 jobs:
-
   build:
     runs-on: ubuntu-latest
     steps:
@@ -19,6 +18,11 @@ jobs:
       uses: actions/setup-go@v3
       with:
         go-version: 1.19
+
+    - name: golangci-lint
+      uses: golangci/golangci-lint-action@v3
+      with:
+        version: v1.51.1
 
     - name: Run coverage
       run: go test -race -coverprofile=coverage.out -covermode=atomic
