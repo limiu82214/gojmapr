@@ -2,12 +2,10 @@ name: Go
 
 on:
   push:
-    branches: [ "!master" ] # not allow push to master, should use PR
-  pull_request:
-    branches: [ "master" ]
+    branches: [ "*" ]
 
 jobs:
-  build:
+  lint:
     runs-on: ubuntu-latest
     steps:
 
@@ -24,11 +22,15 @@ jobs:
       with:
         version: v1.51.1
 
-    - name: Run coverage
-      run: go test -race -coverprofile=coverage.out -covermode=atomic
+  build:
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
 
-    - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v3
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.19
 
     - name: Get dependencies
       run: |
