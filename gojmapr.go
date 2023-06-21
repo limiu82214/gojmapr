@@ -66,6 +66,8 @@ func mapIt(realData, e interface{}) error {
 			}
 		case jpath == "" && isPtrNil(vField):
 			return ErrMapDataToNilPtr
+		case jpath == "":
+			continue
 		default:
 			v, err := gojpath.Get(realData, jpath)
 			if err != nil {
