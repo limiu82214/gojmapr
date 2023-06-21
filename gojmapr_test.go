@@ -112,6 +112,19 @@ func (ex *ExampleSuite) TestJsonPlugin() {
 	ex.Assert().Equal(ex.anserStruct.RequestID, s.RequestID)
 }
 
+func (ex *ExampleSuite) TestNoTagError() {
+	jsonString := ex.complexJSONString
+
+	type tmpStruct struct {
+		RequestID string `gojmapr:"$.request_id"`
+		Price     string
+	}
+
+	var s tmpStruct
+	err := Unmarshal([]byte(jsonString), &s)
+	ex.Assert().Nil(err)
+}
+
 func (ex *ExampleSuite) TestParseTimeError() {
 	jsonString := ex.complexJSONString
 
