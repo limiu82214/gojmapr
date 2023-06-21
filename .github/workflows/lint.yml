@@ -1,10 +1,8 @@
 name: Go
 
 on:
-  push:
-    branches: [ "**", "!master" ] # master only accept PR, and every PR will be verify by this and branch protection rule
   pull_request:
-    branches: [ "**", "!master"] # master only accept PR, and every PR will be verify by this and branch protection rule
+    branches: [ "master" ] # master only accept PR, and every PR will be verify by this and branch protection rule
 
 jobs:
   lint:
